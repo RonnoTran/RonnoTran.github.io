@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>JavaScrip Game</title>
+  <style>
+    * {
+      padding: 0;
+      margin: auto;
+    }
+
+    canvas {
+      background: lightblue;
+      display: block;
+      margin: auto;
+    }
+
+    body {
+      background: #a4f442;
+    }
+  </style>
+</head>
+
+<body>
+  <h1 style="text-align:center">Simple Game using Canvas</h1>
+  <br>
+  <canvas id="myCanvas" width="700" height="500"></canvas>
+
+  <script>
+    var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+    var x = canvas.width/2;      // define x location
+    var y = canvas.height-30;    // define y location
+    var dx = 3;       // define another x variable for moving the ball
+    var dy = -3;      // define another y variable for moving the ball
+    var ballRadius = 10;    // define the ball radius
+
+    var paddleHeight = 10;  // define the height of paddle
+    var paddleWidth = 85;   // define the width of paddle
+    var paddleX = (canvas.width - paddleWidth)/2; // define the x position of the paddle
+
+    var rightPressed = false; // define the status of right arrow button
+    var leftPressed = false;  // define the status of left arrow button
+
+    var brickRowCount = 7;  // define the number of rows of brick
+    var brickColumnCount = 8; // define the number of collumns of brick
+    var brickWidth = 70;    // define the width of the brick
+    var brickHeight = 20;   // define the height of the brick
+    var brickPadding = 10;  // define the padding of the brick
+    var brickOffsetTop = 30;  // define the brick offset from the top wall
+    var brickOffsetLeft = 30; // define the the brick offset from the left wall
+    // define 2d array to create the brick
+    var bricks = [];
+    for (c = 0; c < brickColumnCount; c++) {
+      bricks[c] = [];
+      for (r = 0; r < brickRowCount; r++) {
+        bricks[c][r] = {x:0, y:0, status: 1};
+      }
+    }
+
+    var score = 0;  // define the score
+    var lives = 3;  // define the number of lives
+
+    document.addEventListener("keydown", keyDownHandler, false);  // add evenst for pressing down the key
+    document.addEventListener("keyup", keyUpHandler, false);  // add events for releasing the key
+
+    // check if the left or right key pressed
+    function keyDownHandler(e) {
+      if (e.keyCode == 39) {
+        rightPressed = true;
+      } else if (e.keyCode == 37) {
+        leftPressed = true;
+      }
+    }
+    // check if the key is released
+    function keyUpHandler(e) {
+      if (e.keyCode == 39) {
+        rightPressed = false;
+      } else if (e.keyCode == 37) {
+        leftPressed = false;
+      }
+    }
+
+    // draw the ball
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+      ctx.fillStyle = "white";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    // draw the rectangle to hit the ball back
+    function drawPaddle() {
+      ctx.beginPath();
+      ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+      ctx.fillStyle = "red";
+      ctx.fill();
+      ctx.closePath();
+    }
+    // draw the brick using 2d array
+    function drawBricks() {
+      for (c = 0; c < brickColumnCount; c++) {
+        for (r = 0; r < brickRowCount; r++) {
+          if (bricks[c][r].status == 1) {
+          var brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
+          var brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
+          bricks[c][r].x = brickX;
+          bricks[c][r].y = brickY;
+          ctx.beginPath();
+          ctx.rect(brickX, brickY, brickWidth, brickHeight);
+          ctx.fillStyle = "green";
+          ctx.fill();
+          ctx.closePath();
+          }
+        }
+      }
+    }
+    // check if the ball hit the wall
+    function collisionDetection() {
+      for (c = 0; c < brickColumnCount; c++) {
+        for (r = 0; r < brickRowCount; r++) {
+          var b = bricks[c][r];
+          if (b.status == 1) {
+            if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
+            dy = -dy;
+            b.status = 0;
+            score++;
+            if (score == brickRowCount * brickColumnCount) {
+              alert("You win, Congratualation");
+              document.location.reload();
+            }
+            }
+          }
+        }
+      }
+    }
+
+    // draw the score
+    function drawScore() {
+      ctx.font = "16px Arial";
+      ctx.fillStyle = "black";
+      ctx.fillText("Score: "+ score, 8, 20);
+    }
+    // draw lives
+    function drawLives() {
+      ctx.font = "16px Arial";
+      ctx.fillStyle = "black";
+      ctx.fillText("Lives: "+ lives, canvas.width - 65, 20);
+    }
+
+    // main function
+    function draw() {
+      // drawing Code
+      ctx.clearRect(0, 0, canvas.width, canvas.height);     // clear the frame everytime that the function draw is called
+      drawBricks();
+      drawBall();   // called the drawBall function
+      drawPaddle(); // draw the pa  ddle to hit the ball back
+      drawScore();
+      drawLives();
+      collisionDetection();
+
+
+      // check if the ball hit the top wall or bottom wall
+      if (y + dy < ballRadius) {
+        dy = -dy;
+      } else if (y + dy > canvas.height - ballRadius) {
+        if (x > paddleX && x < paddleX + paddleWidth) {
+          dy = -dy;
+        } else {
+          lives--;
+          if (lives == 0) {
+            alert("Game Over");
+            document.location.reload();
+          } else {
+            x = canvas.width/2;
+            y = canvas.height - 30;
+            dx = 3;
+            dy = -3;
+            paddleX = (canvas.width-paddleWidth)/2;
+          }
+        }
+      }
+      // check if the ball hit the left wall or right wall
+      if (x + dx < ballRadius || x + dx > canvas.width - ballRadius) {
+        dx = -dx;
+      }
+
+      // move the paddle if left or right button was pressed
+      if (rightPressed && paddleX < canvas.width - paddleWidth) {
+        paddleX += 7;
+      } else if (leftPressed && paddleX > 0) {
+        paddleX -= 7;
+      }
+
+      x += dx;
+      y += dy;
+      // call draw again and again
+      requestAnimationFrame(draw);
+
+    }
+    draw();
+
+  </script>
+  </body>
+
+</html>
