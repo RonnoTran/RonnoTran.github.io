@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8" />
-  <title>JavaScrip Game</title>
+  <title>Easy BreakOut Game</title>
   <style>
     * {
       padding: 0;
@@ -30,40 +30,44 @@
   <script>
     var canvas = document.getElementById("myCanvas");
     var ctx = canvas.getContext("2d");
-    var x = canvas.width/2;      // define x location
-    var y = canvas.height-30;    // define y location
-    var dx = 3;       // define another x variable for moving the ball
-    var dy = -3;      // define another y variable for moving the ball
-    var ballRadius = 10;    // define the ball radius
+    var x = canvas.width / 2; // define x location
+    var y = canvas.height - 30; // define y location
+    var dx = 3; // define another x variable for moving the ball
+    var dy = -3; // define another y variable for moving the ball
+    var ballRadius = 10; // define the ball radius
 
-    var paddleHeight = 10;  // define the height of paddle
-    var paddleWidth = 85;   // define the width of paddle
-    var paddleX = (canvas.width - paddleWidth)/2; // define the x position of the paddle
+    var paddleHeight = 10; // define the height of paddle
+    var paddleWidth = 85; // define the width of paddle
+    var paddleX = (canvas.width - paddleWidth) / 2; // define the x position of the paddle
 
     var rightPressed = false; // define the status of right arrow button
-    var leftPressed = false;  // define the status of left arrow button
+    var leftPressed = false; // define the status of left arrow button
 
-    var brickRowCount = 7;  // define the number of rows of brick
+    var brickRowCount = 7; // define the number of rows of brick
     var brickColumnCount = 8; // define the number of collumns of brick
-    var brickWidth = 70;    // define the width of the brick
-    var brickHeight = 20;   // define the height of the brick
-    var brickPadding = 10;  // define the padding of the brick
-    var brickOffsetTop = 30;  // define the brick offset from the top wall
+    var brickWidth = 70; // define the width of the brick
+    var brickHeight = 20; // define the height of the brick
+    var brickPadding = 10; // define the padding of the brick
+    var brickOffsetTop = 30; // define the brick offset from the top wall
     var brickOffsetLeft = 30; // define the the brick offset from the left wall
     // define 2d array to create the brick
     var bricks = [];
     for (c = 0; c < brickColumnCount; c++) {
       bricks[c] = [];
       for (r = 0; r < brickRowCount; r++) {
-        bricks[c][r] = {x:0, y:0, status: 1};
+        bricks[c][r] = {
+          x: 0,
+          y: 0,
+          status: 1
+        };
       }
     }
 
-    var score = 0;  // define the score
-    var lives = 3;  // define the number of lives
+    var score = 0; // define the score
+    var lives = 3; // define the number of lives
 
-    document.addEventListener("keydown", keyDownHandler, false);  // add evenst for pressing down the key
-    document.addEventListener("keyup", keyUpHandler, false);  // add events for releasing the key
+    document.addEventListener("keydown", keyDownHandler, false); // add evenst for pressing down the key
+    document.addEventListener("keyup", keyUpHandler, false); // add events for releasing the key
 
     // check if the left or right key pressed
     function keyDownHandler(e) {
@@ -85,7 +89,7 @@
     // draw the ball
     function drawBall() {
       ctx.beginPath();
-      ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+      ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
       ctx.fillStyle = "white";
       ctx.fill();
       ctx.closePath();
@@ -104,15 +108,15 @@
       for (c = 0; c < brickColumnCount; c++) {
         for (r = 0; r < brickRowCount; r++) {
           if (bricks[c][r].status == 1) {
-          var brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
-          var brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
-          bricks[c][r].x = brickX;
-          bricks[c][r].y = brickY;
-          ctx.beginPath();
-          ctx.rect(brickX, brickY, brickWidth, brickHeight);
-          ctx.fillStyle = "green";
-          ctx.fill();
-          ctx.closePath();
+            var brickX = (c * (brickWidth + brickPadding)) + brickOffsetLeft;
+            var brickY = (r * (brickHeight + brickPadding)) + brickOffsetTop;
+            bricks[c][r].x = brickX;
+            bricks[c][r].y = brickY;
+            ctx.beginPath();
+            ctx.rect(brickX, brickY, brickWidth, brickHeight);
+            ctx.fillStyle = "green";
+            ctx.fill();
+            ctx.closePath();
           }
         }
       }
@@ -124,13 +128,13 @@
           var b = bricks[c][r];
           if (b.status == 1) {
             if (x > b.x && x < b.x + brickWidth && y > b.y && y < b.y + brickHeight) {
-            dy = -dy;
-            b.status = 0;
-            score++;
-            if (score == brickRowCount * brickColumnCount) {
-              alert("You win, Congratualation");
-              document.location.reload();
-            }
+              dy = -dy;
+              b.status = 0;
+              score++;
+              if (score == brickRowCount * brickColumnCount) {
+                alert("You win, Congratualation");
+                document.location.reload();
+              }
             }
           }
         }
@@ -141,21 +145,21 @@
     function drawScore() {
       ctx.font = "16px Arial";
       ctx.fillStyle = "black";
-      ctx.fillText("Score: "+ score, 8, 20);
+      ctx.fillText("Score: " + score, 8, 20);
     }
     // draw lives
     function drawLives() {
       ctx.font = "16px Arial";
       ctx.fillStyle = "black";
-      ctx.fillText("Lives: "+ lives, canvas.width - 65, 20);
+      ctx.fillText("Lives: " + lives, canvas.width - 65, 20);
     }
 
     // main function
     function draw() {
       // drawing Code
-      ctx.clearRect(0, 0, canvas.width, canvas.height);     // clear the frame everytime that the function draw is called
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // clear the frame everytime that the function draw is called
       drawBricks();
-      drawBall();   // called the drawBall function
+      drawBall(); // called the drawBall function
       drawPaddle(); // draw the pa  ddle to hit the ball back
       drawScore();
       drawLives();
@@ -174,11 +178,11 @@
             alert("Game Over");
             document.location.reload();
           } else {
-            x = canvas.width/2;
+            x = canvas.width / 2;
             y = canvas.height - 30;
             dx = 3;
             dy = -3;
-            paddleX = (canvas.width-paddleWidth)/2;
+            paddleX = (canvas.width - paddleWidth) / 2;
           }
         }
       }
@@ -201,8 +205,19 @@
 
     }
     draw();
-
   </script>
-  </body>
+  <br>
+  <p style="text-align: center;">I am making this website for a school project. I would appreciate if anyone would kindly donate to me 1$</p>
+  <br>
+  <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" style="text-align:center;">
+    <input type="hidden" name="cmd" value="_s-xclick">
+    <input type="hidden" name="hosted_button_id" value="TRCFV3V8WW55U">
+    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+    <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+  </form>
+  // play background music
+  <iframe width="0" height="0" src="https://www.youtuberepeater.com/watch?v=VMAHluHJB5k" frameborder="0" allowfullscreen></iframe>
+
+</body>
 
 </html>
